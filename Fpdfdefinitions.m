@@ -90,94 +90,12 @@ switch pdf.name
         syms y
         density = exp(-10*y^2);
         
-%     case 'PowerLogNormal'
-%         syms y
-%         c = pdf.parameters(1);
-%         s = pdf.parameters(2);
-        
+  
         
 end
 
-% if strcmp(pdf.name,'Uniform') == 0
 int_xdensity = int(y*density);
 int_density = int(density);
-% end
 eqn = diff(density) == 0;
 y = double(solve(eqn));
 density_max = subs(density);
-
-% % % function [density,int_density,int_xdensity] = Fpdfdefinitions(pdf)
-% % % 
-% % % %%%% The outputs are in symbolic expressions. To evaluate them, either
-% % % %%%% assign a value to their inputs and use subs(.) or convert them to a
-% % % %%%% matlab function using matlabFunction. Latter option needs all the
-% % % %%%% inputs to be assigned values, whereas the former can have one or more
-% % % %%%% inputs as symbolic. Word of caution: when you use subs(.), be sure to
-% % % %%%% have the exact symbol assigned. 
-% % % 
-% % % switch pdf.name
-% % %     case 'Gaussian'
-% % %         syms y
-% % %         mu = pdf.parameters(1);
-% % %         sigma = pdf.parameters(2);
-% % %         
-% % %         
-% % %         if isa(mu,'sym') == 1
-% % %             density(y,mu) = (exp(-(y-mu).^2/(4*sigma^2)))/(sqrt(2*pi*sigma^2));
-% % %         else
-% % %             if isa(mu,'double') == 1
-% % %                 density = (exp(-(y-mu).^2/(4*sigma^2)))/(sqrt(2*pi*sigma^2));
-% % %             else
-% % %                 disp('mu is of incorrect data type')
-% % %             end
-% % %         end
-% % %         
-% % %     
-% % %     case 'Cauchy'
-% % %         syms y
-% % %         
-% % %         x0 = pdf.parameters(1);
-% % %         pargamma = pdf.parameters(2);
-% % %         
-% % %         if isa(x0,'sym') == 1
-% % %             density(y,x0) = 1/(pi*pargamma*(1+((y-x0)/pargamma).^2));
-% % %         else
-% % %             if isa(x0,'double') == 1
-% % %                 density = 1/(pi*pargamma*(1+((y-x0)/pargamma).^2));
-% % %             else
-% % %                 disp('x0 is of incorrect data type')
-% % %             end
-% % %         end
-% % %         
-% % %     case 'Exponential'
-% % %         syms y
-% % %         lambda = pdf.parameters(1);
-% % %         if isa(lambda,'sym') == 1
-% % %             density(y,lambda) = (lambda*exp(-(lambda*y)));
-% % %         else
-% % %             if isa(lambda,'double') == 1
-% % %                 density = (lambda*exp(-(lambda*y)));
-% % %             else
-% % %                 disp('lambda is of incorrect data type')
-% % %             end
-% % %         end
-% % %         
-% % %     case 'Gamma'
-% % %         syms y
-% % %         k = pdf.parameters(1);
-% % %         theta = pdf.parameters(2);
-% % %         
-% % %         if isa(k,'sym') == 1
-% % %             density(y,k) = ((y^(k-1) * exp(-y/theta) )/(gamma(k)*theta^k));
-% % %         else
-% % %             if isa(k,'double') == 1
-% % %                 density = ((y^(k-1) * exp(-y/theta) )/(gamma(k)*theta^k));
-% % %             else
-% % %                 disp('k is of incorrect data type')
-% % %             end
-% % %         end
-% % %         
-% % % end
-% % % int_xdensity = int(y*density);
-% % % int_density = int(density);
-% % % 
