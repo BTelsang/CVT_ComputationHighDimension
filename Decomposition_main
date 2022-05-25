@@ -1,0 +1,74 @@
+clear;
+clc;
+
+%%% n: number of dimensions
+%%% Omega_i = [a_i,b_i], then Omega = Omega_1 x ... x Omega_n
+%%% Nis: Number of generators in each Omega_i is in Nis(i)
+%%% pdf{i} is the density in the i^th dimension 
+
+global gridinc tol
+
+gridinc = 0.001;
+tol = 1e-6;
+n = 2;
+a = -5*ones(n,1);
+b = 5*ones(n,1);
+Omega = cell(n);
+pdf = cell(n);
+Nis = 10*ones(n,1);
+for i = 1:n
+    Omega{i} = a(i):gridinc:b(i);
+    pdf{i}.name = 'Gaussian';
+    pdfmu = 0;
+    sigma = 1;
+    pdf{i}.parameters = [pdfmu sigma];
+    pdf{i}.unknownparameters = [0 0];
+end
+N = prod(Nis); % the total number of generators in R^n
+
+zibold_supstar = cell(n,1);
+Vibold_supstar = cell(n,1);
+z_ini = cell(n,1);
+for i = 1:n
+    Ni = Nis(i);
+    z_ini{i} =  sort(a(i) + (b(i)-a(i)).*rand(Ni,1));
+    z_Llyods = FLlyods(Omega{i},Ni,pdf{i},z_ini{i}); % Using Lloyds to get the centroids CVTs:
+    V_Llyods = FVoronoi(z_Llyods,Omega{i}); % Obtain the corresponding Voronoi partitions
+    IsCVT_Llyods = FIsCVT(z_Llyods,V_Llyods,Omega{i},pdf{i}); % check whether the pair of centroids 
+    % and their Voronoi partitions is a CVT {z_Llyods,V_Llyods} in Omega_i under density pdf_i
+    zibold_supstar{i} = z_Llyods; %dimension is R^Ni. This is the set of centroids of the CVT in dimension i.
+    Vibold_supstar{i} = V_Llyods; %their Voronoi partitions
+end
+
+% Take the n CVTs, each of Ni number of centroids, obtained in one-dimensional spaces
+% and obtain the CVT with N centroids in the high-dimensional space R^n
+vec_Nis = cell(n,1);
+for i = 1:n
+    vec_Nis{i} = 1:Nis(i);
+end
+
+indices_permuted = combvec(vec_Nis{1:n}); %size is nxN
+N = prod(Nis);
+for k = 1:N
+    for i = 1:n
+        z_supstar(i,k) = zibold_supstar{i}(indices_permuted(i,k)); 
+        V_supstar{i,k} = Vibold_supstar{i}(indices_permuted(i,k));
+    end
+end
+% Compute the tessellation energy 
+CVTEnergy = FCVTEnergy(z_supstar,V_supstar,pdf); %z_supstar is the set of N number of 
+% centroids in R^n and V_supstar is the set of corresponding Voronoi regions
+
+% Plot the centroids for 2- and 3- dimensions
+switch n
+    case 2
+        figure;
+        plot(z_supstar(1,:),z_supstar(2,:),'*')
+        axis([a(1) b(1) a(2) b(2)])
+        xlabel('\Omega_1')
+        ylabel('\Omega_2')
+        title('Centroids in R^n')
+    case 3
+        figure;
+        plot3(z_supstar(1,:),z_supstar(2,:),z_supstar(3,:),'*')
+end
